@@ -175,8 +175,10 @@ public class ServidorThread implements Runnable {
         close();
     }
 
+    //Chama o controller para poder adicionar o cliente a uma partida ou criar uma
+    //nova caso não exita.
     private void entrarPartida(String[] dado) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        controller.entrarPartida(Integer.parseInt(dado[1]), Integer.parseInt(dado[2]), this.socket);
     }
 
 
