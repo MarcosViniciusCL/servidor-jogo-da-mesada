@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import servidor.pbl.control.Jogador;
 
 /**
  *
@@ -90,7 +89,13 @@ public class Sala {
     }
 
     public void iniciarPartida() {
-        enviarMensGRP("111;"); //iniciar partida;
+        try {
+            Thread.sleep(500);
+            enviarMensGRP("111;"); //iniciar partida;
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Sala.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
     /**
@@ -104,6 +109,10 @@ public class Sala {
         } catch (IOException ex) {
             Logger.getLogger(Sala.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public int indexJogador(Object novoJogador) {
+        return this.jogadores.indexOf(novoJogador);
     }
 
 }
