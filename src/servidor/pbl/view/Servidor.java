@@ -63,9 +63,10 @@ public class Servidor implements Runnable {
         }
     }
 
-    public void pararServidor() throws InterruptedException {
+    public void pararServidor() throws InterruptedException, IOException {
         ativo = false;
         encerrarConexoes();
+        servidor.close();
         if(threadServidor != null){
             threadServidor.join();
         }
