@@ -13,7 +13,6 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.control.Controller;
-import servidor.pbl.control.Jogador;
 
 /**
  *
