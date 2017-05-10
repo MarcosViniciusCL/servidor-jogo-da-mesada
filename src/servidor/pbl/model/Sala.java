@@ -5,45 +5,61 @@
  */
 package servidor.pbl.model;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import servidor.pbl.control.Jogador;
 
 /**
  *
  * @author marcos
  */
 public class Sala {
+
     private InetAddress endGrupo; //Endereço do grupo multicast da sala.
-    private final List<Socket> jogadores; //Lista com os sockets de todos os jogadores da sala
+    private int porta; //Porta do grupo multicast.
+    private MulticastSocket grupoMulticast;
+    private final List<Jogador> jogadores; //Lista com os sockets de todos os jogadores da sala
     private int maxJogadores; //Quantidade maxima de jogadores na sala.
     private int quantMes; //Quantidade de meses dessa partida;
 
     public Sala(InetAddress endGrupo, int maxJogadores, int quantMes) {
         this.endGrupo = endGrupo;
+        this.porta = 12123;
+        try {
+            this.grupoMulticast = new MulticastSocket(porta);
+        } catch (IOException ex) {
+            Logger.getLogger(Sala.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.jogadores = new ArrayList<>();
         this.maxJogadores = maxJogadores;
         this.quantMes = quantMes;
     }
 
-    public void addJogador(Socket socket){
-        this.jogadores.add(socket);
+    public void addJogador(Jogador jogador) {
+        this.jogadores.add(jogador);
     }
-    
-    public void remJogador(Socket socket){
-        int index = jogadores.indexOf(socket);
+
+    public void remJogador(Jogador jogador) {
+        int index = jogadores.indexOf(jogador);
         jogadores.remove(index);
     }
-    
+
     /**
      * Retorna a quantidade de jogadores que está na sala.
-     * @return 
+     *
+     * @return
      */
-    public int getQuantJogadoresSala(){
+    public int getQuantJogadoresSala() {
         return this.jogadores.size();
     }
-    
+
     public InetAddress getEndGrupo() {
         return endGrupo;
     }
@@ -54,7 +70,8 @@ public class Sala {
 
     /**
      * Retorna a quantidade maxima de jogadores nessa sala.
-     * @return 
+     *
+     * @return
      */
     public int getMaxJogadores() {
         return maxJogadores;
@@ -71,8 +88,22 @@ public class Sala {
     public void setQuantMes(int quantMes) {
         this.quantMes = quantMes;
     }
-    
-    
-    
-    
+
+    public void iniciarPartida() {
+        enviarMensGRP("111;"); //iniciar partida;
+    }
+
+    /**
+     * Envia mensagem para para todos os clientes que estão na sala.
+     * @param mens 
+     */
+    private void enviarMensGRP(String mens) {
+        try {
+            DatagramPacket env = new DatagramPacket(mens.getBytes(), mens.length(), this.endGrupo, this.porta);
+            grupoMulticast.send(env);
+        } catch (IOException ex) {
+            Logger.getLogger(Sala.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }

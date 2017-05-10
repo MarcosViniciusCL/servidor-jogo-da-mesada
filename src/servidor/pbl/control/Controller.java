@@ -31,6 +31,7 @@ public class Controller {
     public Controller() {
         this.gruposMulticast = new ArrayList();
         this.salas = new ArrayList();
+        this.criarArrayValores();
     }
 
     //******************************************* METODOS PARA GERENCIAR O JOGO ****************************
@@ -39,15 +40,20 @@ public class Controller {
      *
      * @param maxJogadores
      * @param quantMeses
-     * @param socketNovoJogador
+     * @param novoJogador
      */
-    public void entrarPartida(int maxJogadores, int quantMeses, Socket socketNovoJogador) {
+    public void entrarPartida(int maxJogadores, int quantMeses, Jogador novoJogador) {
         Sala sala = pesquisarSala(maxJogadores, quantMeses); //Pesquiasando se já existe uma sala com essas caracteristicas
         if (sala == null || sala.getQuantJogadoresSala() >= maxJogadores) {
-            sala = novaSala(maxJogadores, quantMeses);
-            sala.addJogador(socketNovoJogador);
+            sala = novaSala(maxJogadores, quantMeses); //Cria uma nova sala;
+            sala.addJogador(novoJogador); //Adiciona um novo jogador;
+            novoJogador.assinarGrupo(sala.getEndGrupo().getHostName(), 12123); //Manda o cliente se cadastrar no grupo que foi adicionado
         } else {
-            sala.addJogador(socketNovoJogador);
+            sala.addJogador(novoJogador); //Adiciona novo jogador na sala;
+            novoJogador.assinarGrupo(sala.getEndGrupo().getHostName(), 12123); //Manda o cliente se cadastrar no grupo que foi adicionado
+            if(sala.getQuantJogadoresSala() >= maxJogadores){
+                sala.iniciarPartida();
+            }
         }
         
     }

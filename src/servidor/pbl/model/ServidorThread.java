@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.control.Controller;
+import servidor.pbl.control.Jogador;
 
 /**
  *
@@ -20,7 +21,7 @@ import servidor.pbl.control.Controller;
  */
 public class ServidorThread implements Runnable {
 
-    private Socket socket;
+    private Jogador jogador;
     private Thread servidorCliente;
     private boolean ativo;
     private PrintStream enviar;
@@ -29,13 +30,13 @@ public class ServidorThread implements Runnable {
 
     public ServidorThread(Socket socket) {
         super();
-        this.socket = socket;
+        this.jogador = new Jogador("JOGADOR", socket);
         configurar();
     }
 
     @Override
     public void run() {
-        String enderecoIp = this.socket.getInetAddress().getHostAddress();
+        String enderecoIp = this.jogador.getSocket().getInetAddress().getHostAddress();
         System.out.println("Conexão iniciada: "+enderecoIp);
         while (ativo) {
             seletorAcao((String) receberMensagem());
@@ -92,7 +93,7 @@ public class ServidorThread implements Runnable {
      */
     public void closeSocket() {
         try {
-            this.socket.close();
+            this.jogador.getSocket().close();
         } catch (IOException ex) {
             Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -126,8 +127,8 @@ public class ServidorThread implements Runnable {
      */
     private void configurar() {
         try {
-            this.enviar = new PrintStream(socket.getOutputStream());
-            this.receber = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.enviar = new PrintStream(jogador.getSocket().getOutputStream());
+            this.receber = new BufferedReader(new InputStreamReader(jogador.getSocket().getInputStream()));
             this.controller = Controller.getInstance();
             this.ativo = true;
         } catch (IOException ex) {
@@ -139,9 +140,9 @@ public class ServidorThread implements Runnable {
      * Encerra a conexão.
      */
     private void close() {
-        if (socket != null) {
+        if (jogador.getSocket() != null) {
             try {
-                socket.close();
+                jogador.getSocket().close();
             } catch (IOException ex) {
                 Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -160,7 +161,7 @@ public class ServidorThread implements Runnable {
 
         receber = null;
         enviar = null;
-        socket = null;
+        jogador = null;
 
         ativo = false;
     }
@@ -178,7 +179,9 @@ public class ServidorThread implements Runnable {
     //Chama o controller para poder adicionar o cliente a uma partida ou criar uma
     //nova caso não exita.
     private void entrarPartida(String[] dado) {
-        controller.entrarPartida(Integer.parseInt(dado[1]), Integer.parseInt(dado[2]), this.socket);
+        //dado[1] - NOME, dado[2] - maxJogadores, dado[3] - qauntMeses
+        this.jogador.setNome(dado[1]);
+        controller.entrarPartida(Integer.parseInt(dado[2]), Integer.parseInt(dado[3]), this.jogador);
     }
 
 
