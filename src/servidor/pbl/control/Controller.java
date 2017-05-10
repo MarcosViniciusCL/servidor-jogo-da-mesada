@@ -5,6 +5,7 @@
  */
 package servidor.pbl.control;
 
+import servidor.pbl.model.Jogador;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -47,9 +48,11 @@ public class Controller {
         if (sala == null || sala.getQuantJogadoresSala() >= maxJogadores) {
             sala = novaSala(maxJogadores, quantMeses); //Cria uma nova sala;
             sala.addJogador(novoJogador); //Adiciona um novo jogador;
+            novoJogador.setIdentificacao(sala.indexJogador(novoJogador)+1); //Identifica o jogador com o numero de sua posiçãõ na lista+1
             novoJogador.assinarGrupo(sala.getEndGrupo().getHostName(), 12123); //Manda o cliente se cadastrar no grupo que foi adicionado
         } else {
             sala.addJogador(novoJogador); //Adiciona novo jogador na sala;
+            novoJogador.setIdentificacao(sala.indexJogador(novoJogador)+1); //Identifica o jogador com o numero de sua posiçãõ na lista+1
             novoJogador.assinarGrupo(sala.getEndGrupo().getHostName(), 12123); //Manda o cliente se cadastrar no grupo que foi adicionado
             if(sala.getQuantJogadoresSala() >= maxJogadores){
                 sala.iniciarPartida();
@@ -59,9 +62,9 @@ public class Controller {
     }
 
     private Sala novaSala(int maxJogadores, int quantMeses) {
-        InetAddress endGrupD = enderecoGrupDisp();
-        Sala sala = new Sala(endGrupD, maxJogadores, quantMeses);
-        salas.add(sala);
+        InetAddress endGrupD = enderecoGrupDisp(); //Retorna o endereço que disponivel para criar um novo grupo.
+        Sala sala = new Sala(endGrupD, maxJogadores, quantMeses); //Cria uma nva sala.
+        salas.add(sala); //Adiciona a sala na lista
         return sala;
     }
 
