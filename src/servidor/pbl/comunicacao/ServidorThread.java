@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servidor.pbl.model;
+package servidor.pbl.comunicacao;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.control.Controller;
+import servidor.pbl.model.Jogador;
 
 /**
  *

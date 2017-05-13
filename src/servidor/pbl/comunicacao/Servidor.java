@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servidor.pbl.view;
+package servidor.pbl.comunicacao;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import servidor.pbl.model.ServidorThread;
+import servidor.pbl.comunicacao.ServidorThread;
 
 /**
  *
