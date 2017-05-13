@@ -22,7 +22,7 @@ public class GerenciadorDeEndereco {
      * @param quantidade 
      */
     private void criarEnderecos(int quantidade){
-        if(quantidade<254){
+        if(quantidade<255){
             for(int i = 0; i<quantidade; i++){
                 enderecos[i] = new Endereco("239.0.0."+(i+1));
             }
