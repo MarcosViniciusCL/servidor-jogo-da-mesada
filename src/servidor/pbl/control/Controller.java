@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.exceptions.LimiteDeSalasExcedidoException;
 import servidor.pbl.model.Sala;
-import util.GerenciadorDeEndereco;
+import servidor.pbl.util.GerenciadorDeEndereco;
 
 /**
  * Faz o controller de todas as ações do servidor, entre elas estão criar salas, adicionar um
