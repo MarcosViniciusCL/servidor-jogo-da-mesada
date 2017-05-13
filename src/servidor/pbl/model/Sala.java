@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -113,6 +112,14 @@ public class Sala {
 
     public int indexJogador(Object novoJogador) {
         return this.jogadores.indexOf(novoJogador);
+    }
+    
+    /**
+     * Verifica se a sala está cheia.
+     * @return verdadeiro ou falso.
+     */
+    public boolean isFull(){
+        return jogadores.size()==maxJogadores;
     }
 
 }
