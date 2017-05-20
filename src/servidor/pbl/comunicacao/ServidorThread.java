@@ -9,11 +9,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.control.Controller;
 import servidor.pbl.exceptions.LimiteDeSalasExcedidoException;
+import servidor.pbl.exceptions.SalaInexistenteException;
 import servidor.pbl.model.Jogador;
 
 /**
@@ -22,21 +25,22 @@ import servidor.pbl.model.Jogador;
  */
 public class ServidorThread implements Runnable {
 
+    private Jogador jogador;
     private Thread servidorCliente;
     private boolean ativo;
     private PrintStream enviar;
     private BufferedReader receber;
-    private Socket socket;
+    private Controller controller;
 
     public ServidorThread(Socket socket) {
         super();
-        this.socket = socket; 
+        this.jogador = new Jogador("JOGADOR", socket);
         configurar();
     }
 
     @Override
     public void run() {
-        String enderecoIp = socket.getInetAddress().getHostAddress();
+        String enderecoIp = this.jogador.getSocket().getInetAddress().getHostAddress();
         System.out.println("Conexão iniciada: "+enderecoIp);
         while (ativo) {
             seletorAcao((String) receberMensagem());
@@ -56,11 +60,11 @@ public class ServidorThread implements Runnable {
             String[] dado = dados.split(";");
 
             switch (dado[0]) {
-                case "101": //Informa que quer participar de uma partida
-                    Protocolo.entrarSala(socket, dado[1], dado[2], dado[3]);
+                case "100": //Informa que quer participar de uma partida
+                    entrarPartida(dado);
                     break;
-                case "0xff": //Desconectar;
-                    desconectar();
+                case "101": //Desconectar;
+                    sairPartida(dado);
                     break;
             }
         }
@@ -93,7 +97,7 @@ public class ServidorThread implements Runnable {
      */
     public void closeSocket() {
         try {
-            socket.close();
+            this.jogador.getSocket().close();
         } catch (IOException ex) {
             Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -127,8 +131,9 @@ public class ServidorThread implements Runnable {
      */
     private void configurar() {
         try {
-            this.enviar = new PrintStream(socket.getOutputStream());
-            this.receber = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.enviar = new PrintStream(jogador.getSocket().getOutputStream());
+            this.receber = new BufferedReader(new InputStreamReader(jogador.getSocket().getInputStream()));
+            this.controller = Controller.getInstance();
             this.ativo = true;
         } catch (IOException ex) {
             close();
@@ -139,9 +144,9 @@ public class ServidorThread implements Runnable {
      * Encerra a conexão.
      */
     private void close() {
-        if (socket != null) {
+        if (jogador.getSocket() != null) {
             try {
-                socket.close();
+                jogador.getSocket().close();
             } catch (IOException ex) {
                 Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -160,16 +165,49 @@ public class ServidorThread implements Runnable {
 
         receber = null;
         enviar = null;
-        socket = null;
+        jogador = null;
 
         ativo = false;
     }
 
+
+
     /**
      * Desconecta do cliente conectado.
      */
-    private void desconectar() {
-        enviarMensagem("0xff");
-        close();
+
+
+    //Chama o controller para poder adicionar o cliente a uma partida ou criar uma
+    //nova caso não exita.
+    private void entrarPartida(String[] dado) {
+        //dado[1] - NOME, dado[2] - maxJogadores, dado[3] - qauntMeses
+        this.jogador.setNome(dado[1]);
+        try {
+            controller.entrarPartida(Integer.parseInt(dado[2]), Integer.parseInt(dado[3]), this.jogador);
+        } catch (LimiteDeSalasExcedidoException ex) {
+            enviarMensagem("105");
+        }
+    }
+    
+    /**
+     * Jogador deseja sair da sala
+     * @param dado endereço da sala
+     */
+    private void sairPartida(String[] dado) {
+        try {
+            controller.sairPartida(jogador, InetAddress.getByName(dado[1]));
+            enviarMensagem("106"); //confirmação da saida
+            close();
+        } catch (SalaInexistenteException | UnknownHostException ex) {
+            enviarMensagem("107"); //caso a sala não seja encontrada
+        }
+    }
+    
+    /**
+     * 
+     * @param dado 
+     */
+    private void partidaTerminada(String[] dado){
+        
     }
 }

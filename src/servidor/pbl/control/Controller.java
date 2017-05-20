@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.exceptions.LimiteDeSalasExcedidoException;
+import servidor.pbl.exceptions.SalaInexistenteException;
 import servidor.pbl.model.Sala;
 import servidor.pbl.util.GerenciadorDeEndereco;
 
@@ -66,6 +67,19 @@ public class Controller {
     }
     
     /**
+     * Remove um jogador da sala
+     * @param jogador jogador que deseja abandonar a partida
+     * @param endSala endereço da sala do jogador
+     */
+    public void sairPartida(Jogador jogador, InetAddress endSala) throws SalaInexistenteException{
+        Sala sala = buscarSalasCadastradas(endSala);
+        if(sala !=null){
+            sala.remJogador(jogador);
+        }
+        throw new SalaInexistenteException();
+    }
+    
+    /**
      * Cria uma nova sala.
      * @param maxJogadores A quantidade maxima de jogadores da nova sala.
      * @param quantMeses A quantidade de meses do tabuleiro da sala.
@@ -81,7 +95,10 @@ public class Controller {
         return sala;
     }
 
-    
+    /**
+     * Devolve um endereço disponivel para criação de sala 
+     * @return 
+     */
     private InetAddress enderecoGrupDisp(){
         String ip = gerenciadorDeEndereco.getEnderecoAvailable();
         if(ip==null){
@@ -121,6 +138,20 @@ public class Controller {
     private Sala pesquisarSala(int maxJogadores, int quantMeses) {
         for (Sala sala : salas) {
             if (sala.getMaxJogadores() == maxJogadores && sala.getQuantMes() == quantMeses) {
+                return sala;
+            }
+        }
+        return null;
+    }
+     
+    /**
+     * Procura uma sala já cadastrada pelo endereço
+     * @param end 
+     * @return 
+     */
+    private Sala buscarSalasCadastradas(InetAddress end){
+        for(Sala sala : salas){
+            if(sala.getEndGrupo().equals(end)){
                 return sala;
             }
         }
