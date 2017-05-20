@@ -5,10 +5,38 @@
  */
 package servidor.pbl.comunicacao;
 
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import servidor.pbl.control.Controller;
+import servidor.pbl.exceptions.LimiteDeSalasExcedidoException;
+import servidor.pbl.model.Jogador;
+
 /**
  *
  * @author emerson
  */
-public class Protocolo {
+public abstract class Protocolo {
+    private static Controller controller = Controller.getInstance();
     
+    /**
+     *
+     * @param socket
+     * @param nome
+     * @param qtdMaxJogadores
+     * @param qtdMeses
+     * @param qtdMax
+     */
+    public static String entrarSala(Socket socket, String nome, String MaxJogadores, String quantMeses){
+        try {
+            int qtdJogadores = Integer.getInteger(MaxJogadores);
+            int qtdMeses = Integer.getInteger(quantMeses);
+            
+            Jogador jogador = new Jogador(nome, socket);
+            controller.entrarPartida(qtdJogadores, qtdMeses, jogador);
+            return ""; //Ok
+        } catch (LimiteDeSalasExcedidoException ex) {
+            return ""; //erro
+        }
+    }
 }

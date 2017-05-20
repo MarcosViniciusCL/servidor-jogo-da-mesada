@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.control.Controller;
+import servidor.pbl.exceptions.LimiteDeSalasExcedidoException;
 import servidor.pbl.model.Jogador;
 
 /**
@@ -21,22 +22,21 @@ import servidor.pbl.model.Jogador;
  */
 public class ServidorThread implements Runnable {
 
-    private Jogador jogador;
     private Thread servidorCliente;
     private boolean ativo;
     private PrintStream enviar;
     private BufferedReader receber;
-    private Controller controller;
+    private Socket socket;
 
     public ServidorThread(Socket socket) {
         super();
-        this.jogador = new Jogador("JOGADOR", socket);
+        this.socket = socket; 
         configurar();
     }
 
     @Override
     public void run() {
-        String enderecoIp = this.jogador.getSocket().getInetAddress().getHostAddress();
+        String enderecoIp = socket.getInetAddress().getHostAddress();
         System.out.println("Conexão iniciada: "+enderecoIp);
         while (ativo) {
             seletorAcao((String) receberMensagem());
@@ -57,7 +57,7 @@ public class ServidorThread implements Runnable {
 
             switch (dado[0]) {
                 case "101": //Informa que quer participar de uma partida
-                    entrarPartida(dado);
+                    Protocolo.entrarSala(socket, dado[1], dado[2], dado[3]);
                     break;
                 case "0xff": //Desconectar;
                     desconectar();
@@ -93,7 +93,7 @@ public class ServidorThread implements Runnable {
      */
     public void closeSocket() {
         try {
-            this.jogador.getSocket().close();
+            socket.close();
         } catch (IOException ex) {
             Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -127,9 +127,8 @@ public class ServidorThread implements Runnable {
      */
     private void configurar() {
         try {
-            this.enviar = new PrintStream(jogador.getSocket().getOutputStream());
-            this.receber = new BufferedReader(new InputStreamReader(jogador.getSocket().getInputStream()));
-            this.controller = Controller.getInstance();
+            this.enviar = new PrintStream(socket.getOutputStream());
+            this.receber = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.ativo = true;
         } catch (IOException ex) {
             close();
@@ -140,9 +139,9 @@ public class ServidorThread implements Runnable {
      * Encerra a conexão.
      */
     private void close() {
-        if (jogador.getSocket() != null) {
+        if (socket != null) {
             try {
-                jogador.getSocket().close();
+                socket.close();
             } catch (IOException ex) {
                 Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -161,12 +160,10 @@ public class ServidorThread implements Runnable {
 
         receber = null;
         enviar = null;
-        jogador = null;
+        socket = null;
 
         ativo = false;
     }
-
-
 
     /**
      * Desconecta do cliente conectado.
@@ -175,14 +172,4 @@ public class ServidorThread implements Runnable {
         enviarMensagem("0xff");
         close();
     }
-
-    //Chama o controller para poder adicionar o cliente a uma partida ou criar uma
-    //nova caso não exita.
-    private void entrarPartida(String[] dado) {
-        //dado[1] - NOME, dado[2] - maxJogadores, dado[3] - qauntMeses
-        this.jogador.setNome(dado[1]);
-        controller.entrarPartida(Integer.parseInt(dado[2]), Integer.parseInt(dado[3]), this.jogador);
-    }
-
-
 }
