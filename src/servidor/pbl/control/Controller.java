@@ -47,6 +47,7 @@ public class Controller {
      * @param maxJogadores
      * @param quantMeses
      * @param novoJogador
+     * @throws servidor.pbl.exceptions.LimiteDeSalasExcedidoException
      */
     public void entrarPartida(int maxJogadores, int quantMeses, Jogador novoJogador) throws LimiteDeSalasExcedidoException {
         Sala sala = pesquisarSala(maxJogadores, quantMeses); //Pesquiasando se já existe uma sala com essas caracteristicas

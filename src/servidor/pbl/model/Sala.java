@@ -90,13 +90,22 @@ public class Sala {
     public void iniciarPartida() {
         try {
             Thread.sleep(500);
-            enviarMensGRP("111;"); //iniciar partida;
+            enviarMensGRP("111;"+gerarInfJogadores()); //iniciar partida;
         } catch (InterruptedException ex) {
             Logger.getLogger(Sala.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }
 
+    private String gerarInfJogadores(){
+        String aux = "";
+        aux += this.jogadores.size()+";";
+        for (Jogador jogador : jogadores) {
+            aux += jogador.getIdentificacao()+";";
+            aux += jogador.getNome()+";";
+        }
+        return aux;
+    }
     /**
      * Envia mensagem para para todos os clientes que estão na sala.
      * @param mens 
