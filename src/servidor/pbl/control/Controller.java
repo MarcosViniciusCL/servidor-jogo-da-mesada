@@ -50,8 +50,8 @@ public class Controller {
      * @throws servidor.pbl.exceptions.LimiteDeSalasExcedidoException
      */
     public void entrarPartida(int maxJogadores, int quantMeses, Jogador novoJogador) throws LimiteDeSalasExcedidoException {
-        Sala sala = pesquisarSala(maxJogadores, quantMeses); //Pesquiasando se já existe uma sala com essas caracteristicas
-        if (sala == null || sala.isFull()) { //verifica se não encontrou a sala, ou se a sala encontrada está cheia
+        Sala sala = pesquisarSalaDisponivel(maxJogadores, quantMeses); //Pesquiasando se já existe uma sala com essas caracteristicas
+        if (sala == null) { //verifica se não encontrou a sala, ou se a sala encontrada está cheia
             sala = novaSala(maxJogadores, quantMeses); //Cria uma nova sala;
             sala.addJogador(novoJogador); //Adiciona um novo jogador;
             novoJogador.setIdentificacao(sala.indexJogador(novoJogador)+1); //Identifica o jogador com o numero de sua posiçãõ na lista+1
@@ -136,9 +136,9 @@ public class Controller {
      *
      * @return Sala
      */
-    private Sala pesquisarSala(int maxJogadores, int quantMeses) {
+    private Sala pesquisarSalaDisponivel(int maxJogadores, int quantMeses) {
         for (Sala sala : salas) {
-            if (sala.getMaxJogadores() == maxJogadores && sala.getQuantMes() == quantMeses) {
+            if (sala.getMaxJogadores() == maxJogadores && sala.getQuantMes() == quantMeses && !sala.isFull()) {
                 return sala;
             }
         }
