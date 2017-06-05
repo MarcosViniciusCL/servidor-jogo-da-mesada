@@ -90,7 +90,7 @@ public class Sala {
     public void iniciarPartida() {
         try {
             Thread.sleep(500);
-            enviarMensGRP("111;"+gerarInfJogadores()); //iniciar partida;
+            enviarMensGRP("0;111;"+gerarInfJogadores()); //iniciar partida;
         } catch (InterruptedException ex) {
             Logger.getLogger(Sala.class.getName()).log(Level.SEVERE, null, ex);
         }
