@@ -96,6 +96,10 @@ public class Sala {
         }
         
     }
+    
+    public void finalizarPartida(String msg){
+        enviarMensGRP("0;112;"+msg);
+    }
 
     private String gerarInfJogadores(){
         String aux = "";

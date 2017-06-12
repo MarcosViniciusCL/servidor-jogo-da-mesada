@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import servidor.pbl.control.Controller;
 import servidor.pbl.exceptions.LimiteDeSalasExcedidoException;
 import servidor.pbl.exceptions.SalaInexistenteException;
@@ -65,6 +66,8 @@ public class ServidorThread implements Runnable {
                     break;
                 case "101": //Desconectar;
                     sairPartida(dado);
+                case "3102":
+                    finalizarPartida(dado);
                     break;
             }
         }
@@ -203,11 +206,13 @@ public class ServidorThread implements Runnable {
         }
     }
     
-    /**
-     * 
-     * @param dado 
-     */
-    private void partidaTerminada(String[] dado){
-        
+    private void finalizarPartida(String [] dado){
+        try {
+            controller.finalizarPartida(dado);
+        } catch (UnknownHostException ex) {
+            JOptionPane.showConfirmDialog(null, "erro ao finalizar partida");
+        }
     }
+    
+    
 }

@@ -9,11 +9,13 @@ import servidor.pbl.model.Jogador;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.pbl.exceptions.LimiteDeSalasExcedidoException;
 import servidor.pbl.exceptions.SalaInexistenteException;
+import servidor.pbl.model.JogadorFinal;
 import servidor.pbl.model.Sala;
 import servidor.pbl.util.GerenciadorDeEndereco;
 
@@ -175,6 +177,31 @@ public class Controller {
             Controller.controller = new Controller();
         }
         return controller;
+    }
+
+    public void finalizarPartida(String[] dado) throws UnknownHostException {
+       List <JogadorFinal> jogadoresFinals = new ArrayList<>();
+       
+       Sala sala = buscarSalasCadastradas(InetAddress.getByName(dado[1]));
+       
+       for(int i= 2; i<dado.length; i= i+3){
+           int id = Integer.parseInt(dado[i]);
+           String nome = dado[i+1];
+           double saldo = Double.parseDouble(dado[i+2]);
+           JogadorFinal j = new JogadorFinal(id, nome, saldo);
+           jogadoresFinals.add(j);
+       }
+       
+       Collections.sort(jogadoresFinals);
+       
+       String mensagem = "";
+       
+       for(JogadorFinal j: jogadoresFinals){
+           mensagem += j.getId()+";"+j.getNome()+";"+j.getSaldo()+";";
+       }
+       
+       sala.finalizarPartida(mensagem);
+       salas.remove(sala);
     }
 
 }
