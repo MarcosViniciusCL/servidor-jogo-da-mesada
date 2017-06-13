@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import servidor.pbl.comunicacao.ServidorThread;
+import servidor.pbl.control.Controller;
 
 /**
  *
@@ -70,6 +71,8 @@ public class Servidor implements Runnable {
         if(threadServidor != null){
             threadServidor.join();
         }
+        Controller control = Controller.getInstance();
+        control.encerrarServico();
 
     }
 

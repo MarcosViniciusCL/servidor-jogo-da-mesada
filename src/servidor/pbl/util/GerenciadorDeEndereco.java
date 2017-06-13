@@ -10,9 +10,11 @@ package servidor.pbl.util;
  * @author emerson
  */
 public class GerenciadorDeEndereco {
-    Endereco [] enderecos;
+    private int quantEndereco;
+    private Endereco [] enderecos;
     
     public GerenciadorDeEndereco(int quantidade){
+        this.quantEndereco = quantidade;
         enderecos = new Endereco[quantidade];
         criarEnderecos(quantidade);
     }
@@ -53,5 +55,9 @@ public class GerenciadorDeEndereco {
                 endereco.liberarEndereco();
             }
         }
+    }
+
+    public void zerarEndereco() {
+        criarEnderecos(this.quantEndereco);
     }
 }

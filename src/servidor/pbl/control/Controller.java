@@ -51,7 +51,7 @@ public class Controller {
      * @param novoJogador
      * @throws servidor.pbl.exceptions.LimiteDeSalasExcedidoException
      */
-    public void entrarPartida(int maxJogadores, int quantMeses, Jogador novoJogador) throws LimiteDeSalasExcedidoException {
+    public synchronized void entrarPartida(int maxJogadores, int quantMeses, Jogador novoJogador) throws LimiteDeSalasExcedidoException {
         Sala sala = pesquisarSalaDisponivel(maxJogadores, quantMeses); //Pesquiasando se já existe uma sala com essas caracteristicas
         if (sala == null) { //verifica se não encontrou a sala, ou se a sala encontrada está cheia
             sala = novaSala(maxJogadores, quantMeses); //Cria uma nova sala;
@@ -74,7 +74,7 @@ public class Controller {
      * @param jogador jogador que deseja abandonar a partida
      * @param endSala endereço da sala do jogador
      */
-    public void sairPartida(Jogador jogador, InetAddress endSala) throws SalaInexistenteException{
+    public synchronized void sairPartida(Jogador jogador, InetAddress endSala) throws SalaInexistenteException{
         Sala sala = buscarSalasCadastradas(endSala);
         if(sala !=null){
             sala.remJogador(jogador);
@@ -114,24 +114,6 @@ public class Controller {
         }
         return null;
     }
-    /**
-     * Retorna o endereco multicast que estiver disponivel para criar um novo
-     * grupo.
-     *
-     * @return InetAddress - Endereço multicast disponivel.
-     */
-    /*private InetAddress enderecoGrupDisp() {
-        for (int i = 0; i < endUsados.length; i++) {
-            if (endUsados[i] == false) {
-                try {
-                    return InetAddress.getByName(endGrupDisp[i]);
-                } catch (UnknownHostException ex) {
-                    Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        return null;
-    }*/
 
     /**
      * Pesquisa salas que contem a mesma quantida de jogadores e meses de jogo.
@@ -160,17 +142,6 @@ public class Controller {
         }
         return null;
     }
-
-    /*private void criarArrayValores() {
-        this.endGrupDisp = new String[10];
-        this.endUsados = new boolean[10];
-        for (int i = 0; i < 10; i++) {    //Gerando valores de endereços para grupos(PROVISORIO)
-            endGrupDisp[i] = "239.0.0." + i;
-        }
-        for (int i = 0; i < 10; i++) {    //Informando que nenhum endereco foi usado ainda(PROVISORIO)
-            endUsados[i] = false;
-        }
-    }*/
 
     public static Controller getInstance() {
         if (controller == null) {
@@ -202,6 +173,11 @@ public class Controller {
        
        sala.finalizarPartida(mensagem);
        salas.remove(sala);
+    }
+
+    public void encerrarServico() {
+        this.salas.clear();
+        Controller.gerenciadorDeEndereco.zerarEndereco();
     }
 
 }
