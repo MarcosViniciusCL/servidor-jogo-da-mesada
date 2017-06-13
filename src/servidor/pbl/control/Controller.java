@@ -185,9 +185,9 @@ public class Controller {
        Sala sala = buscarSalasCadastradas(InetAddress.getByName(dado[1]));
        
        for(int i= 2; i<dado.length; i= i+3){
-           int id = Integer.parseInt(dado[i]);
-           String nome = dado[i+1];
-           double saldo = Double.parseDouble(dado[i+2]);
+           int id = Integer.parseInt(dado[i].trim());
+           String nome = dado[i+1].trim();
+           double saldo = Double.parseDouble(dado[i+2].trim());
            JogadorFinal j = new JogadorFinal(id, nome, saldo);
            jogadoresFinals.add(j);
        }

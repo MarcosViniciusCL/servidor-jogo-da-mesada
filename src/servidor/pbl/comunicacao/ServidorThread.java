@@ -66,7 +66,7 @@ public class ServidorThread implements Runnable {
                     break;
                 case "101": //Desconectar;
                     sairPartida(dado);
-                case "3102":
+                case "112":
                     finalizarPartida(dado);
                     break;
             }
